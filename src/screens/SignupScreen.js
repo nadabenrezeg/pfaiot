@@ -90,6 +90,7 @@ export default function SignupScreen({ navigation }) {
         />
       </View>
       <TouchableOpacity style={styles.button} onPress={handleSignup}>
+        
         <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
       <Text style={styles.footerText}>

@@ -1,22 +1,64 @@
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
+import { addDoc, collection, getDocs, getFirestore } from 'firebase/firestore';
+
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
   const [patients, setPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      const db = getFirestore();
-      const patientsCollection = collection(db, 'patients'); // Assurez-vous que le nom de la collection est correct
-      const patientSnapshot = await getDocs(patientsCollection);
-      const patientList = patientSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPatients(patientList);
-    };
+  const db = getFirestore();
 
-    fetchPatients();
-  }, []);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+  if (isFocused) {
+    fetchPatients(); // Recharge les patients à chaque fois qu'on revient sur l'écran
+  }
+}, [isFocused]);
+
+  const fetchPatients = async () => {
+    try {
+      const patientsCollection = collection(db, 'patients');
+      const patientSnapshot = await getDocs(patientsCollection);
+      const patientList = patientSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setPatients(patientList);
+    } catch (error) {
+      console.error('Erreur lors du chargement des patients :', error);
+    }
+  };
+
+  const handleAddPatient = async () => {
+    try {
+      const patientsCollection = collection(db, 'patients');
+
+      const newPatient = {
+        name: 'Nouveau Patient', // Tu peux remplacer ça par des valeurs dynamiques avec un formulaire
+        createdAt: new Date(),
+      };
+
+      await addDoc(patientsCollection, newPatient);
+
+      Alert.alert('Succès', 'Le patient a bien été ajouté.');
+
+      fetchPatients(); // Recharger la liste
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du patient :", error);
+      Alert.alert('Erreur', "Impossible d'ajouter le patient.");
+    }
+  };
 
   const filteredPatients = patients.filter(patient =>
     patient.name && patient.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -24,16 +66,21 @@ const HomeScreen = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.patientCard}>
-      <Text style={styles.patientName}>{item.name}</Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('MedicalFiche', { patient: item })}
+      >
+        <Text style={styles.patientName}>{item.name}</Text>
+      </TouchableOpacity>
+  
       <TouchableOpacity
         style={styles.modifyButton}
-        onPress={() => navigation.navigate('PatientDetailScreen', { patient: item })}// Passer l'ID du patient
+        onPress={() => navigation.navigate('PatientDetailScreen', { patient: item })}
       >
-        <Text style={styles.modifyButtonText}>Modifier</Text>
+        <Text style={styles.modifyButtonText}>Consulter</Text>
       </TouchableOpacity>
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -42,6 +89,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.logoutText}>Déconnexion</Text>
         </TouchableOpacity>
       </View>
+
       <TextInput
         style={styles.searchInput}
         placeholder="Rechercher un patient..."
@@ -49,12 +97,21 @@ const HomeScreen = ({ navigation }) => {
         value={searchTerm}
         onChangeText={setSearchTerm}
       />
+
       <Text style={styles.patientsTitle}>Patients :</Text>
       <FlatList
         data={filteredPatients}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
+
+<TouchableOpacity
+  style={styles.addButton}
+  onPress={() => navigation.navigate('AddPatientScreen')}
+>
+  <Text style={styles.addButtonText}>+</Text>
+</TouchableOpacity>
+
     </View>
   );
 };
@@ -66,6 +123,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
+    marginTop: 50,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -117,6 +175,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   modifyButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#00796B',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  addButtonText: {
+    fontSize: 30,
     color: '#FFF',
     fontWeight: 'bold',
   },
