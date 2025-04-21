@@ -2,6 +2,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { database, ref, set } from '../firebaseConfig'; // ⚠️ Assure-toi que ce chemin est correct
 
 export default function AddMedicaScreen({ navigation }) {
   const [count, setCount] = useState(1);
@@ -19,6 +20,12 @@ export default function AddMedicaScreen({ navigation }) {
   const incrementMinute = () => setMinute(prev => (prev < 59 ? prev + 1 : prev));
   const decrementMinute = () => setMinute(prev => (prev > 0 ? prev - 1 : prev));
 
+  const getMomentOfDay = (hour) => {
+    if (hour >= 5 && hour < 12) return 'matin';
+    if (hour >= 12 && hour < 17) return 'midi';
+    return 'soir';
+  };
+
   const handleSave = () => {
     const medicaData = {
       name: medicaName,
@@ -26,9 +33,20 @@ export default function AddMedicaScreen({ navigation }) {
       minute,
       count,
       type,
-      date: selectedDate.toISOString().split('T')[0], // format YYYY-MM-DD
+      date: selectedDate.toISOString().split('T')[0],
     };
-    navigation.navigate('CalendarScreen', { newMedica: medicaData });
+
+    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    const momentOfDay = getMomentOfDay(hour); // matin, midi ou soir
+
+    set(ref(database, `servo-time-${momentOfDay}`), formattedTime)
+      .then(() => {
+        console.log(`Heure enregistrée dans servo-time-${momentOfDay}: ${formattedTime}`);
+        navigation.navigate('CalendarScreen', { newMedica: medicaData });
+      })
+      .catch((error) => {
+        console.error("Erreur d'enregistrement Firebase :", error);
+      });
   };
 
   return (
@@ -39,7 +57,6 @@ export default function AddMedicaScreen({ navigation }) {
 
       <Text style={styles.title}>Ajout médicament :</Text>
 
-      {/* Sélecteur de date */}
       <View style={styles.block}>
         <Text style={styles.label}>Date de prise :</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
@@ -54,16 +71,16 @@ export default function AddMedicaScreen({ navigation }) {
         </TouchableOpacity>
 
         {showDatePicker && (
-  <DateTimePicker
-    value={selectedDate}
-    mode="date"
-    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-    onChange={(event, date) => {
-      setShowDatePicker(false);
-      if (date) setSelectedDate(date);
-    }}
-  />
-)}
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, date) => {
+              setShowDatePicker(false);
+              if (date) setSelectedDate(date);
+            }}
+          />
+        )}
       </View>
 
       <View style={styles.block}>

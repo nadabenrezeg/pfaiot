@@ -18,13 +18,11 @@ export default function CalendarScreen({ navigation, route }) {
   const [morningDose, setMorningDose] = useState('');
   const [afternoonDose, setAfternoonDose] = useState('');
   const [eveningDose, setEveningDose] = useState('');
-  const { medication, patient } = route.params;
-
+  const { patient } = route.params; // Récupération du patient depuis les paramètres de navigation
 
   useEffect(() => {
     if (route.params?.newMedica) {
       const { name, hour, date } = route.params.newMedica;
-
       setSelectedDate(date);
 
       if (hour < 12) {
@@ -37,6 +35,11 @@ export default function CalendarScreen({ navigation, route }) {
     }
   }, [route.params?.newMedica]);
 
+  // Fonction pour formater le nom du patient
+  const formatPatientName = (name) => {
+    return `M. ${name}`; // Ajoute "M." devant le nom
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -45,9 +48,12 @@ export default function CalendarScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
+      {/* En-tête avec le nom du patient */}
       <View style={styles.patientHeader}>
-        <Text style={styles.patientName}>Mr. Ben Ahmed</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('AddMedicaScreen')}>
+        <Text style={styles.patientName}>
+          {patient?.name ? formatPatientName(patient.name) : 'Patient'}
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('AddMedicaScreen', { patient })}>
           <Icon name="add-circle-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -114,10 +120,14 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginBottom: 20,
   },
-  patientName: { color: '#fff', fontWeight: 'bold', fontSize: 16},
+  patientName: { 
+    color: '#fff', 
+    fontWeight: 'bold', 
+    fontSize: 16,
+    textTransform: 'capitalize' // Met la première lettre en majuscule
+  },
   calendar: { borderRadius: 15, overflow: 'hidden', marginBottom: 10 },
   monthText: {
-    
     fontSize: 16,
     color: '#00796B',
     textAlign: 'center',
@@ -132,7 +142,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignSelf: 'flex-start',
     marginBottom: 8,
-    
   },
   bubbleInput: { minWidth: 60, fontSize: 14, color: '#000' },
   saveButton: {
@@ -144,6 +153,5 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 20,
   },
-  
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
 });

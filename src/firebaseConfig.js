@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getDatabase, off, onValue, ref, set } from 'firebase/database';
 
 // Votre configuration Firebase
 const firebaseConfig = {
@@ -8,11 +9,13 @@ const firebaseConfig = {
   projectId: "pillmate-fd180",
   storageBucket: "pillmate-fd180.firebasestorage.app",
   messagingSenderId: "84925124192",
-  appId: "1:84925124192:web:5891161c099004ebacfd05"
+  appId: "1:84925124192:web:5891161c099004ebacfd05",
+   databaseURL: "https://pillmate-fd180-default-rtdb.firebaseio.com/"
 };
 
 // Initialiser Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const database = getDatabase(app);
+export { app, auth, database, off, onValue, ref, set }; // Exportez les objets pour les utiliser dans d'autres fichiers
 
-export { app, auth }; // Exportez les objets pour les utiliser dans d'autres fichiers

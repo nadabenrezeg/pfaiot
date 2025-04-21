@@ -89,7 +89,7 @@ export default function MedicationDetailsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ECEFEA',
+    backgroundColor: '#B2EBF2',
     padding: 16,
   },
   backButton: {
