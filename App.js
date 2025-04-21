@@ -16,6 +16,7 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import SignupScreen from './src/screens/SignupScreen';
 
 
+
 // ✅ Import du nouvel écran
 import AddPatientScreen from './src/screens/AddPatientScreen'; // ⚠️ Assure-toi que le chemin est correct
 
@@ -35,6 +36,8 @@ export default function App() {
         <Stack.Screen name="MedicationDetailsScreen" component={MedicationDetailsScreen} />
         <Stack.Screen name="AddPatientScreen" component={AddPatientScreen} />
         <Stack.Screen name="MedicalFiche" component={MedicalFiche} />
+   
+
 
       </Stack.Navigator>
     </NavigationContainer>

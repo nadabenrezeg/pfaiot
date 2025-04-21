@@ -1,7 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient'; // Importer LinearGradient
+import { LinearGradient } from 'expo-linear-gradient';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../firebaseConfig';
 
@@ -12,32 +12,52 @@ export default function ResetPasswordScreen({ navigation }) {
     try {
       await sendPasswordResetEmail(auth, email);
       Alert.alert("Succès", "Un email de réinitialisation a été envoyé !");
-      navigation.navigate('Login'); // Naviguer vers l'écran de connexion après l'envoi
+      navigation.navigate('Login');
     } catch (error) {
       Alert.alert("Erreur", error.message);
     }
   };
 
   return (
-    <LinearGradient colors={['#A0E7E5', '#00796B']} style={styles.container}>
-      <Icon name="lock" size={50} color="#FFF" style={styles.lockIcon} />
-      <Text style={styles.title}>Mot de Passe Oublié ?</Text>
-      <Text style={styles.subtitle}>
-        Pas de soucis, nous vous enverrons des instructions de réinitialisation
-      </Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Entrez votre Email" 
-        placeholderTextColor="#888"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-        <Text style={styles.buttonText}>Réinitialiser le mot de passe</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.linkText}>Retour</Text>
-      </TouchableOpacity>
+    <LinearGradient 
+      colors={['#E0F7FA', '#80DEEA']} // Dégradé plus clair
+      style={styles.container}
+    >
+      <View style={styles.contentContainer}>
+        <View style={styles.iconContainer}>
+          <Icon name="lock-reset" size={60} color="#00796B" />
+        </View>
+        
+        <Text style={styles.title}>Mot de Passe Oublié ?</Text>
+        
+        <Text style={styles.subtitle}>
+          Entrez votre email pour recevoir les instructions de réinitialisation
+        </Text>
+        
+        <TextInput 
+          style={styles.input} 
+          placeholder="Votre adresse email" 
+          placeholderTextColor="#888"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={handleResetPassword}
+        >
+          <Text style={styles.buttonText}>Envoyer </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Retour à la connexion</Text>
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 }
@@ -45,51 +65,63 @@ export default function ResetPasswordScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFF',
-    marginVertical: 10,
+    fontSize: 26,
+    fontWeight: '600',
+    color: '#00796B',
+    marginBottom: 15,
     textAlign: 'center',
   },
   subtitle: {
-    textAlign: 'center',
-    color: '#FFF',
-    marginBottom: 20,
     fontSize: 16,
+    color: '#00796B',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
   },
   input: {
     width: '100%',
-    padding: 15,
-    borderRadius: 30,
-    backgroundColor: '#FFF',
-    marginBottom: 15,
-    borderColor: '#00796B',
-    borderWidth: 2,
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: 'rgb(255, 255, 255)',
+    marginBottom: 20,
+    fontSize: 16,
     color: '#00796B',
+    borderWidth: 1,
+    borderColor: 'rgba(3, 55, 60, 0.3)',
   },
   button: {
     width: '100%',
-    padding: 15,
-    borderRadius: 30,
-    backgroundColor: '#FFD700', // Couleur jaune pour le bouton
+    padding: 16,
+    borderRadius: 10,
+    backgroundColor: '#00796B',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
+    elevation: 3,
   },
   buttonText: {
-    color: '#000', // Texte en noir
-    fontWeight: 'bold',
-  },
-  linkText: {
     color: '#FFF',
-    fontWeight: 'bold',
-    marginTop: 20,
+    fontWeight: '600',
+    fontSize: 16,
   },
-  lockIcon: {
-    marginBottom: 20,
+  backButton: {
+    padding: 10,
+    alignSelf: 'center',
+  },
+  backButtonText: {
+    color: '#00796B',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });

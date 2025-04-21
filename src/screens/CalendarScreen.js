@@ -18,6 +18,8 @@ export default function CalendarScreen({ navigation, route }) {
   const [morningDose, setMorningDose] = useState('');
   const [afternoonDose, setAfternoonDose] = useState('');
   const [eveningDose, setEveningDose] = useState('');
+  const { medication, patient } = route.params;
+
 
   useEffect(() => {
     if (route.params?.newMedica) {
@@ -44,7 +46,7 @@ export default function CalendarScreen({ navigation, route }) {
       </View>
 
       <View style={styles.patientHeader}>
-        <Text style={styles.patientName}>Mr. Ahmed Ben Ahmed</Text>
+        <Text style={styles.patientName}>Mr. Ben Ahmed</Text>
         <TouchableOpacity onPress={() => navigation.navigate('AddMedicaScreen')}>
           <Icon name="add-circle-outline" size={24} color="#fff" />
         </TouchableOpacity>
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#E0F7FA', padding: 16 },
   topBar: { marginBottom: 10 },
   patientHeader: {
+    marginTop: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -109,11 +112,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 30,
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  patientName: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  patientName: { color: '#fff', fontWeight: 'bold', fontSize: 16},
   calendar: { borderRadius: 15, overflow: 'hidden', marginBottom: 10 },
   monthText: {
+    
     fontSize: 16,
     color: '#00796B',
     textAlign: 'center',
@@ -128,6 +132,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignSelf: 'flex-start',
     marginBottom: 8,
+    
   },
   bubbleInput: { minWidth: 60, fontSize: 14, color: '#000' },
   saveButton: {
@@ -139,5 +144,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 20,
   },
+  
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
 });

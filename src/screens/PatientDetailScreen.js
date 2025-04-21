@@ -1,25 +1,28 @@
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { doc, getFirestore, updateDoc } from 'firebase/firestore'; // en haut (si pas déjà importé)
+import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-
 const PatientDetailScreen = ({ route, navigation }) => {
   const { patient } = route.params;
+  const [image, setImage] = useState(patient.image || null);
 
-  const [image, setImage] = useState(patient.image || null); // image de profil
+  const [disease, setDisease] = useState(patient.disease || '');
+  const [notes, setNotes] = useState(patient.description || '');
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       Alert.alert('Permission refusée', 'Vous devez autoriser l’accès aux photos.');
       return;
     }
@@ -34,85 +37,106 @@ const PatientDetailScreen = ({ route, navigation }) => {
     if (!result.canceled) {
       const selectedImageUri = result.assets[0].uri;
       setImage(selectedImageUri);
-    
+
       try {
         const db = getFirestore();
         const patientRef = doc(db, 'patients', patient.id);
         await updateDoc(patientRef, {
-          image: selectedImageUri, // on enregistre l'image dans Firestore
+          image: selectedImageUri,
         });
       } catch (error) {
         console.error('Erreur en sauvegardant la photo :', error);
         Alert.alert('Erreur', "Impossible d'enregistrer l'image.");
       }
     }
-    
+  };
+
+  const saveTextFields = async () => {
+    try {
+      const db = getFirestore();
+      const patientRef = doc(db, 'patients', patient.id);
+      await updateDoc(patientRef, {
+        disease,
+        description: notes,
+      });
+      Alert.alert('Succès', 'Les informations ont été mises à jour.');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour :', error);
+      Alert.alert('Erreur', 'Échec de la mise à jour.');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header Icons */}
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Header */}
       <View style={styles.topIcons}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-        <Image
-          // source={require('../assets/clip.png')} // Optionnel
-          // style={styles.clip}
-        />
+        <Image />
       </View>
 
-      {/* Avatar cliquable */}
+      {/* Avatar */}
       <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
         <Image
-          source={
-            image
-              ? { uri: image }
-              : { uri: 'https://example.com/default-avatar.png' }
-          }
+          source={image ? { uri: image } : { uri: 'https://example.com/default-avatar.png' }}
           style={styles.avatar}
         />
       </TouchableOpacity>
 
-      {/* Infos patient */}
+      {/* Infos */}
       <LinearGradient colors={['#CFF5E7', '#9ED5C5']} style={styles.infoContainer}>
-        <Text style={styles.nameText}>Mr. {patient.name}</Text>
+        <Text style={styles.nameText}>M. {patient.name}</Text>
 
         <Text style={styles.label}>• Maladie :</Text>
-        <Text style={styles.value}>{patient.disease || 'Non renseignée'}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Entrer la maladie"
+          value={disease}
+          onChangeText={setDisease}
+        />
 
-        <Text style={styles.label}>• Médicaments :</Text>
-        <Text style={styles.value}>{patient.medication || 'Non renseigné'}</Text>
+    
 
-        <Text style={styles.label}>• Description :</Text>
-        <Text style={styles.value}>{patient.description || 'Non renseignée'}</Text>
+        <Text style={styles.label}>• Notes :</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          placeholder="Notes ou remarques médicales"
+          multiline
+          value={notes}
+          onChangeText={setNotes}
+        />
       </LinearGradient>
 
-      {/* Boutons */}
-      <View style={styles.buttonContainer}>
+      {/* Boutons d'action */}
+      <View style={styles.buttonGroup}>
         <TouchableOpacity
-          style={styles.yellowButton}
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('CalendarScreen', { patient })}
+        >
+          <Text style={styles.buttonText}>Traitements</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionButton}
           onPress={() => navigation.navigate('MedicationDetailsScreen', { patient })}
         >
-          <Text style={styles.buttonText}>Détails</Text>
+          <Text style={styles.buttonText}>Suivi</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.yellowButton}
-          onPress={() => navigation.navigate('CalendarScreen')}
-        >
-          <Text style={styles.buttonText}>Calendrier</Text>
+
+        <TouchableOpacity style={styles.actionButton} onPress={saveTextFields}>
+          <Text style={styles.buttonText}>Enregistrer</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-// 🎨 Styles
+// Styles
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#E6E6E6',
     padding: 20,
+    backgroundColor: '#E6E6E6',
   },
   topIcons: {
     flexDirection: 'row',
@@ -120,64 +144,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButton: {
-    marginTop: 50,
+    marginTop: 40,
   },
   backButtonText: {
     fontSize: 24,
   },
-  clip: {
-    width: 20,
-    height: 20,
-  },
   avatarContainer: {
     alignSelf: 'center',
     backgroundColor: '#A0D6B4',
-    borderRadius: 100,
+    borderRadius: 70,
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 20,
+    padding: 3,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   infoContainer: {
     borderRadius: 20,
     padding: 20,
-    marginVertical: 10,
+    marginBottom: 20,
   },
   nameText: {
-    marginTop: 2,
+    fontSize: 22,
     fontWeight: 'bold',
-    fontSize: 20,
-    marginBottom: 15,
     color: '#004B4B',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   label: {
     fontWeight: 'bold',
     fontSize: 16,
-    marginTop: 8,
     color: '#004B4B',
-  },
-  value: {
     marginTop: 10,
-    fontSize: 16,
-    color: '#333',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 30,
-  },
-  yellowButton: {
-    backgroundColor: '#FFD700',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
+  input: {
+    backgroundColor: '#FFF',
     borderRadius: 10,
+    padding: 12,
+    marginTop: 8,
+    fontSize: 16,
+    borderColor: '#00796B',
+    borderWidth: 1,
+  },
+  linkText: {
+    color: '#00796B',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    marginTop: 8,
+    fontSize: 16,
+  },
+  buttonGroup: {
+    flexDirection: 'column',
+   
+    alignItems: 'center',
+    marginTop: 25,
+    marginBottom: 70,
+  },
+  actionButton: {
+    backgroundColor: '#FFD700',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 12,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
     fontWeight: 'bold',
     color: '#000',
+    fontSize: 16,
   },
 });
 
