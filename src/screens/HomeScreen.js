@@ -72,15 +72,15 @@ const HomeScreen = ({ navigation }) => {
         },
         {
           text: 'Supprimer',
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(db, 'patients', patientId));
-              fetchPatients();
-              Alert.alert('Succès', 'Patient supprimé avec succès');
-            } catch (error) {
-              console.error('Erreur lors de la suppression :', error);
-              Alert.alert('Erreur', 'Impossible de supprimer le patient');
-            }
+        onPress: async () => {
+          try {
+            await deleteDoc(doc(db, 'patients', patientId));
+            setPatients(prev => prev.filter(p => p.id !== patientId)); // Mise à jour locale
+            Alert.alert('Succès', 'Patient supprimé avec succès');
+          } catch (error) {
+            console.error('Erreur lors de la suppression :', error);
+            Alert.alert('Erreur', 'Impossible de supprimer le patient');
+          }
           }
         }
       ]

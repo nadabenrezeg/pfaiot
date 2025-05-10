@@ -1,8 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, off, onValue, ref, set } from 'firebase/database';
+import { getDatabase, onValue, ref, serverTimestamp, set } from "firebase/database";
 
-// Votre configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC72KGZCyIey7nw3-Ld1_zWUgCqfmflSME",
   authDomain: "pillmate-fd180.firebaseapp.com",
@@ -10,12 +9,13 @@ const firebaseConfig = {
   storageBucket: "pillmate-fd180.firebasestorage.app",
   messagingSenderId: "84925124192",
   appId: "1:84925124192:web:5891161c099004ebacfd05",
-   databaseURL: "https://pillmate-fd180-default-rtdb.firebaseio.com/"
+  databaseURL: "https://pillmate-fd180-default-rtdb.firebaseio.com/"
 };
 
-// Initialiser Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
-export { app, auth, database, off, onValue, ref, set }; // Exportez les objets pour les utiliser dans d'autres fichiers
+
+export { app, auth, database, onValue, ref, serverTimestamp, set };
 

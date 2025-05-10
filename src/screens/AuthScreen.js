@@ -15,7 +15,6 @@ export default function AuthScreen({ navigation }) {
       Alert.alert("Erreur", error.message); // Affiche une alerte en cas d'erreur
     }
   };
-
   return (
     <View style={styles.container}>
       <TextInput 

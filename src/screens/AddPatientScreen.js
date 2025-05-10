@@ -63,7 +63,7 @@ const AddPatientScreen = ({ navigation }) => {
         "servo-time-midi": "12:30",
         "servo-time-soir": "19:00",
         servo_time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-        temperature: true
+        temperature: 0
       };
 
       // Enregistrement dans Firestore

@@ -4,21 +4,18 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import 'react-native-gesture-handler';
 
-// Import des écrans
+
 import AddMedicaScreen from './src/screens/AddMedicaScreen';
+import AddPatientScreen from './src/screens/AddPatientScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
+import FirstScreen from './src/screens/FirstScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
-import MedicalFiche from './src/screens/MedicalFiche'; // chemin à adapter si besoin
+import MedicalFiche from './src/screens/MedicalFiche';
 import MedicationDetailsScreen from './src/screens/MedicationDetailsScreen';
 import PatientDetailScreen from './src/screens/PatientDetailScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import SignupScreen from './src/screens/SignupScreen';
-
-
-
-// ✅ Import du nouvel écran
-import AddPatientScreen from './src/screens/AddPatientScreen'; // ⚠️ Assure-toi que le chemin est correct
 
 const Stack = createStackNavigator();
 
@@ -26,6 +23,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="FirstScreen" component={FirstScreen} />
+
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
@@ -37,7 +36,6 @@ export default function App() {
         <Stack.Screen name="AddPatientScreen" component={AddPatientScreen} />
         <Stack.Screen name="MedicalFiche" component={MedicalFiche} />
    
-
 
       </Stack.Navigator>
     </NavigationContainer>

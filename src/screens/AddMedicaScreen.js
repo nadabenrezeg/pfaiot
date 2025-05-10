@@ -1,10 +1,22 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useState } from 'react';
+import { get, ref, set } from 'firebase/database';
+import React, { useLayoutEffect, useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { database, ref, set } from '../firebaseConfig'; // ⚠️ Assure-toi que ce chemin est correct
+import { database } from '../firebaseConfig';
 
-export default function AddMedicaScreen({ navigation }) {
+
+
+
+export default function AddMedicaScreen({ navigation, route }) {
+  const { patient } = route.params; // Récupérer le patient à partir de la navigation
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
+  
+
   const [count, setCount] = useState(1);
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
@@ -20,34 +32,59 @@ export default function AddMedicaScreen({ navigation }) {
   const incrementMinute = () => setMinute(prev => (prev < 59 ? prev + 1 : prev));
   const decrementMinute = () => setMinute(prev => (prev > 0 ? prev - 1 : prev));
 
-  const getMomentOfDay = (hour) => {
-    if (hour >= 5 && hour < 12) return 'matin';
-    if (hour >= 12 && hour < 17) return 'midi';
-    return 'soir';
-  };
-
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!medicaName.trim()) {
+      alert('Veuillez entrer le nom du médicament');
+      return;
+    }
+  
+    const formattedDate = selectedDate.toISOString().split('T')[0];
     const medicaData = {
-      name: medicaName,
+      name: medicaName.trim(),
       hour,
       minute,
       count,
       type,
-      date: selectedDate.toISOString().split('T')[0],
+      date: formattedDate,
     };
+  
+    try {
+      const userId = patient?.id || 'defaultUser';
+      const medRef = ref(database, `/medications/${formattedDate}`);
 
-    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-    const momentOfDay = getMomentOfDay(hour); // matin, midi ou soir
-
-    set(ref(database, `servo-time-${momentOfDay}`), formattedTime)
-      .then(() => {
-        console.log(`Heure enregistrée dans servo-time-${momentOfDay}: ${formattedTime}`);
-        navigation.navigate('CalendarScreen', { newMedica: medicaData });
-      })
-      .catch((error) => {
-        console.error("Erreur d'enregistrement Firebase :", error);
-      });
+      const snapshot = await get(medRef);
+      const prevMeds = snapshot.exists() ? snapshot.val() : { morning: [], afternoon: [], evening: [] };
+  
+      let timeOfDay = 'evening';
+      if (hour < 12) timeOfDay = 'morning';
+      else if (hour < 18) timeOfDay = 'afternoon';
+  
+      if (!prevMeds[timeOfDay]) {
+        prevMeds[timeOfDay] = [];
+      }
+  
+      prevMeds[timeOfDay].push(medicaData.name);
+  
+      await set(medRef, prevMeds);
+  
+      if (route.params?.onAddMedica) {
+        route.params.onAddMedica(medicaData); // 🔥 update local CalendarScreen
+      }
+  
+      navigation.goBack();
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement du médicament :', error);
+      alert('Erreur lors de l\'enregistrement.');
+    }
   };
+  
+  
+  
+  
+  
+ 
+    
+  
 
   return (
     <View style={styles.container}>

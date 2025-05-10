@@ -40,7 +40,7 @@ const PatientDetailScreen = ({ route, navigation }) => {
   const pickImage = async () => {
     animatePress();
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (!permissionResult.granted) {
       Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès aux photos.');
       return;
@@ -85,18 +85,14 @@ const PatientDetailScreen = ({ route, navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()} 
-          style={styles.backButton}
-          activeOpacity={0.7}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} activeOpacity={0.7}>
           <Icon name="arrow-back" size={28} color="#004B4B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Détails Patient</Text>
-        <View style={{ width: 28 }} /> {/* Pour l'alignement */}
+        <View style={{ width: 28 }} />
       </View>
 
-      {/* Avatar Section */}
+      {/* Avatar */}
       <View style={styles.avatarSection}>
         <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
           <View style={styles.avatarContainer}>
@@ -113,8 +109,8 @@ const PatientDetailScreen = ({ route, navigation }) => {
       </View>
 
       {/* Info Card */}
-      <LinearGradient 
-        colors={['#CFF5E7', '#9ED5C5']} 
+      <LinearGradient
+        colors={['#CFF5E7', '#9ED5C5']}
         style={styles.infoCard}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -143,20 +139,20 @@ const PatientDetailScreen = ({ route, navigation }) => {
         </View>
       </LinearGradient>
 
-      {/* Action Buttons */}
+      {/* Buttons */}
       <View style={styles.actionsContainer}>
-        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+        <Animated.View style={[styles.animatedButton]}>
           <TouchableOpacity
             style={[styles.actionButton, styles.primaryButton]}
             onPress={() => navigation.navigate('CalendarScreen', { patient })}
             activeOpacity={0.7}
           >
             <Icon name="event-note" size={22} color="#FFF" />
-            <Text style={styles.buttonText}>calendar</Text>
+            <Text style={styles.buttonText}>Calendrier</Text>
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+        <Animated.View style={[styles.animatedButton]}>
           <TouchableOpacity
             style={[styles.actionButton, styles.secondaryButton]}
             onPress={() => navigation.navigate('MedicationDetailsScreen', { patient })}
@@ -167,7 +163,7 @@ const PatientDetailScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+        <Animated.View style={[styles.animatedButton]}>
           <TouchableOpacity
             style={[styles.actionButton, styles.saveButton]}
             onPress={saveTextFields}
