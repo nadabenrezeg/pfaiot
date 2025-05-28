@@ -3,15 +3,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
-  Alert,
-  Animated,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Animated,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -83,7 +83,7 @@ const PatientDetailScreen = ({ route, navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
+   
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton} activeOpacity={0.7}>
           <Icon name="arrow-back" size={28} color="#004B4B" />
@@ -92,7 +92,6 @@ const PatientDetailScreen = ({ route, navigation }) => {
         <View style={{ width: 28 }} />
       </View>
 
-      {/* Avatar */}
       <View style={styles.avatarSection}>
         <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
           <View style={styles.avatarContainer}>
@@ -108,7 +107,7 @@ const PatientDetailScreen = ({ route, navigation }) => {
         <Text style={styles.patientName}>M. {patient.name}</Text>
       </View>
 
-      {/* Info Card */}
+   
       <LinearGradient
         colors={['#CFF5E7', '#9ED5C5']}
         style={styles.infoCard}
@@ -139,7 +138,6 @@ const PatientDetailScreen = ({ route, navigation }) => {
         </View>
       </LinearGradient>
 
-      {/* Buttons */}
       <View style={styles.actionsContainer}>
         <Animated.View style={[styles.animatedButton]}>
           <TouchableOpacity

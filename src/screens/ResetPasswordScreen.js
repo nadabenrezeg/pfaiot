@@ -20,7 +20,7 @@ export default function ResetPasswordScreen({ navigation }) {
 
   return (
     <LinearGradient 
-      colors={['#E0F7FA', '#80DEEA']} // Dégradé plus clair
+      colors={['#E0F7FA', '#80DEEA']} 
       style={styles.container}
     >
       <View style={styles.contentContainer}>

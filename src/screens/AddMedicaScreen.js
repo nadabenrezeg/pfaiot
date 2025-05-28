@@ -3,13 +3,14 @@ import { get, ref, set } from 'firebase/database';
 import React, { useLayoutEffect, useState } from 'react';
 import { Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { database } from '../firebaseConfig';
+import { db } from '../firebaseConfig';
+
 
 
 
 
 export default function AddMedicaScreen({ navigation, route }) {
-  const { patient } = route.params; // Récupérer le patient à partir de la navigation
+  const { patient } = route.params;
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -50,7 +51,8 @@ export default function AddMedicaScreen({ navigation, route }) {
   
     try {
       const userId = patient?.id || 'defaultUser';
-      const medRef = ref(database, `/medications/${formattedDate}`);
+      const medRef = ref(db, `/medications/${formattedDate}`);
+
 
       const snapshot = await get(medRef);
       const prevMeds = snapshot.exists() ? snapshot.val() : { morning: [], afternoon: [], evening: [] };
@@ -68,7 +70,7 @@ export default function AddMedicaScreen({ navigation, route }) {
       await set(medRef, prevMeds);
   
       if (route.params?.onAddMedica) {
-        route.params.onAddMedica(medicaData); // 🔥 update local CalendarScreen
+        route.params.onAddMedica(medicaData);
       }
   
       navigation.goBack();
@@ -77,14 +79,7 @@ export default function AddMedicaScreen({ navigation, route }) {
       alert('Erreur lors de l\'enregistrement.');
     }
   };
-  
-  
-  
-  
-  
- 
     
-  
 
   return (
     <View style={styles.container}>

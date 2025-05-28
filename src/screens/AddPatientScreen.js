@@ -41,7 +41,7 @@ const AddPatientScreen = ({ navigation }) => {
       const dbRealtime = getDatabase();
       const patientId = Date.now().toString();
 
-      // Données pour Firestore
+    
       const patientData = {
         id: patientId,
         name: `${firstName} ${lastName}`,
@@ -55,7 +55,7 @@ const AddPatientScreen = ({ navigation }) => {
         createdAt: new Date().toISOString(),
       };
 
-      // Données pour Realtime Database
+    
       const deviceSettings = {
         led_green: true,
         led_red: false,
@@ -66,10 +66,9 @@ const AddPatientScreen = ({ navigation }) => {
         temperature: 0
       };
 
-      // Enregistrement dans Firestore
+      
       await addDoc(collection(dbFirestore, 'patients'), patientData);
 
-      // Enregistrement dans Realtime Database
       await set(ref(dbRealtime, `patients/${patientId}/device_settings`), deviceSettings);
 
       Alert.alert('Succès', 'Patient ajouté avec succès');

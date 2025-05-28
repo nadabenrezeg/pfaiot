@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { database, onValue, ref, set } from '../firebaseConfig';
+import { db, onValue, ref, set } from '../firebaseConfig'; // ✅ Correction ici
 
 export default function MedicationDetailsScreen({ navigation }) {
   const [morning, setMorning] = useState(false);
@@ -27,8 +27,8 @@ export default function MedicationDetailsScreen({ navigation }) {
   const showWarning = !noon && !evening;
 
   useEffect(() => {
-    const dbRef = ref(database);
-    const medicationsRef = ref(database, 'medications');
+    const dbRef = ref(db); // ✅ Correction ici
+    const medicationsRef = ref(db, 'medications'); // ✅ Correction ici
 
     const unsubscribeConfig = onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
@@ -61,7 +61,6 @@ export default function MedicationDetailsScreen({ navigation }) {
     };
   }, []);
 
-  // ⚙️ Activation automatique de la prise
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -76,14 +75,14 @@ export default function MedicationDetailsScreen({ navigation }) {
       const checkAndSet = (servoTime, setState) => {
         const target = parseTime(servoTime);
         if (target !== null && Math.abs(currentMinutes - target) <= 1) {
-          setState(ledGreen); // Active ou désactive selon led_green
+          setState(ledGreen); 
         }
       };
 
       checkAndSet(servoTimeMatin, setMorning);
       checkAndSet(servoTimeMidi, setNoon);
       checkAndSet(servoTimeSoir, setEvening);
-    }, 30000); // toutes les 30 secondes
+    }, 30000); 
 
     return () => clearInterval(interval);
   }, [servoTimeMatin, servoTimeMidi, servoTimeSoir, ledGreen]);
@@ -91,7 +90,7 @@ export default function MedicationDetailsScreen({ navigation }) {
   const recordMedicationTime = async (timeOfDay) => {
     try {
       const now = new Date();
-      const timeRef = ref(database, 'temps');
+      const timeRef = ref(db, 'temps'); // ✅ Correction ici
       await set(timeRef, now.toLocaleTimeString());
       Alert.alert('Succès', `Heure enregistrée: ${now.toLocaleTimeString()}`);
     } catch (error) {
@@ -169,7 +168,6 @@ export default function MedicationDetailsScreen({ navigation }) {
         <Text style={styles.infoText}>Dernière mise à jour: {lastUpdated || '--:--'}</Text>
       </View>
 
-      {/* Indicateur LED */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
         <Text style={{ fontSize: 16, marginRight: 10 }}>LED Green:</Text>
         <View style={{
@@ -180,7 +178,6 @@ export default function MedicationDetailsScreen({ navigation }) {
         }} />
       </View>
 
-      {/* Prises */}
       <View style={[styles.section, { backgroundColor: morning ? '#66BB6A' : '#E57373' }]}>
         <View>
           <Text style={styles.label}>Prise du Matin</Text>

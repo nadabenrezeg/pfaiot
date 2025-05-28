@@ -1,4 +1,4 @@
-import { LinearGradient } from 'expo-linear-gradient'; // Importer LinearGradient
+import { LinearGradient } from 'expo-linear-gradient';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff', // Couleur du texte
+    color: '#fff', 
     textAlign: 'center',
   },
   image: {

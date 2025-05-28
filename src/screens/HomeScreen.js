@@ -1,17 +1,23 @@
 import { useIsFocused } from '@react-navigation/native';
-import { collection, deleteDoc, doc, getDocs, getFirestore } from 'firebase/firestore';
+import {
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    getFirestore
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  RefreshControl,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    FlatList,
+    RefreshControl,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../firebaseConfig';
@@ -37,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
       const patientSnapshot = await getDocs(patientsCollection);
       const patientList = patientSnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setPatients(patientList);
     } catch (error) {
@@ -61,34 +67,51 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const handleDeletePatient = async (patientId) => {
-    Alert.alert(
-      'Confirmer la suppression',
-      'Voulez-vous vraiment supprimer ce patient ?',
-      [
-        {
-          text: 'Annuler',
-          style: 'cancel'
-        },
-        {
-          text: 'Supprimer',
+const deleteSubcollection = async (patientId, subcollectionName) => {
+  const subcollectionRef = collection(db, 'patients', patientId, subcollectionName);
+  const snapshot = await getDocs(subcollectionRef);
+  const deletions = snapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletions);
+};
+
+const handleDeletePatient = async (patientId) => {
+  Alert.alert(
+    'Confirmer la suppression',
+    'Voulez-vous vraiment supprimer ce patient ?',
+    [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
         onPress: async () => {
           try {
-            await deleteDoc(doc(db, 'patients', patientId));
-            setPatients(prev => prev.filter(p => p.id !== patientId)); // Mise à jour locale
+            setIsRefreshing(true);
+
+          
+            await deleteSubcollection(patientId, 'medications');
+            await deleteSubcollection(patientId, 'visits');
+          
+
+      
+            const docRef = doc(db, 'patients', patientId);
+            await deleteDoc(docRef);
+
+            setPatients(prev => prev.filter(p => p.id !== patientId));
             Alert.alert('Succès', 'Patient supprimé avec succès');
           } catch (error) {
             console.error('Erreur lors de la suppression :', error);
-            Alert.alert('Erreur', 'Impossible de supprimer le patient');
+            Alert.alert('Erreur', 'Échec de la suppression du patient');
+          } finally {
+            setIsRefreshing(false);
           }
-          }
-        }
-      ]
-    );
-  };
+        },
+      },
+    ]
+  );
+};
+
 
   const filteredPatients = patients.filter(patient =>
-    patient.name && patient.name.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderItem = ({ item }) => (
@@ -103,21 +126,16 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.patientDetails}>
           <View style={styles.nameRow}>
             <Text style={styles.patientName}>{item.name}</Text>
-            <TouchableOpacity 
-              onPress={() => handleDeletePatient(item.id)}
-              style={styles.deleteButton}
-            >
+            <TouchableOpacity onPress={() => handleDeletePatient(item.id)} style={styles.deleteButton}>
               <Icon name="delete" size={20} color="#F44336" />
             </TouchableOpacity>
           </View>
           <Text style={styles.patientMeta}>
-            {item.lastVisit ? `Dernière visite: ${item.lastVisit}` : 'Nouveau patient'}
+            {item.lastVisit ? `Dernière visite : ${item.lastVisit}` : 'Nouveau patient'}
           </Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity 
-        onPress={() => navigation.navigate('PatientDetailScreen', { patient: item })}
-      >
+      <TouchableOpacity onPress={() => navigation.navigate('PatientDetailScreen', { patient: item })}>
         <Icon name="chevron-right" size={24} color="#888" />
       </TouchableOpacity>
     </View>
@@ -133,15 +151,12 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.greeting}>Bonjour Docteur,</Text>
             <Text style={styles.welcomeText}>Vos patients</Text>
           </View>
-          <TouchableOpacity 
-            style={styles.logoutButton} 
-            onPress={handleLogout}
-          >
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Icon name="logout" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
 
-        {/* Search Bar */}
+        {/* Search */}
         <View style={styles.searchContainer}>
           <Icon name="search" size={20} color="#888" style={styles.searchIcon} />
           <TextInput
@@ -159,7 +174,7 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        {/* Patients List */}
+      
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Liste des patients</Text>
           <Text style={styles.patientCount}>
@@ -193,11 +208,10 @@ const HomeScreen = ({ navigation }) => {
           }
         />
 
-        {/* Add Patient Button */}
+      
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('AddPatientScreen')}
-          activeOpacity={0.8}
         >
           <Icon name="add" size={30} color="#FFF" />
         </TouchableOpacity>
@@ -207,14 +221,8 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#B2EBF2',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#B2EBF2',
-  },
+  safeArea: { flex: 1, backgroundColor: '#B2EBF2' },
+  container: { flex: 1, backgroundColor: '#B2EBF2' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -231,16 +239,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 20,
   },
-  greeting: {
-    fontSize: 16,
-    color: '#B2DFDB',
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFF',
-    marginTop: 5,
-  },
+  greeting: { fontSize: 16, color: '#B2DFDB' },
+  welcomeText: { fontSize: 24, fontWeight: 'bold', color: '#FFF', marginTop: 5 },
   logoutButton: {
     padding: 8,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -261,9 +261,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  searchIcon: {
-    marginRight: 10,
-  },
+  searchIcon: { marginRight: 10 },
   searchInput: {
     flex: 1,
     height: '100%',
@@ -277,11 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 20,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00796B',
-  },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#00796B' },
   patientCount: {
     fontSize: 14,
     color: '#888',
@@ -290,10 +284,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
+  listContent: { paddingHorizontal: 20, paddingBottom: 20 },
   patientCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -308,11 +299,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  patientInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
+  patientInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   avatarContainer: {
     width: 50,
     height: 50,
@@ -322,27 +309,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 15,
   },
-  patientDetails: {
-    flex: 1,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  patientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 10,
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  patientMeta: {
-    fontSize: 12,
-    color: '#888',
-  },
+  patientDetails: { flex: 1 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  patientName: { fontSize: 16, fontWeight: '600', color: '#333', marginRight: 10 },
+  deleteButton: { padding: 4 },
+  patientMeta: { fontSize: 12, color: '#888' },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',

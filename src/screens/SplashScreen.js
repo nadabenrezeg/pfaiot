@@ -6,7 +6,7 @@ const SplashScreen = () => {
   const navigation = useNavigation();
   const spinValue = new Animated.Value(0);
 
-  // Animation rotation pour le logo
+
   Animated.loop(
     Animated.timing(spinValue, {
       toValue: 1,
@@ -22,9 +22,9 @@ const SplashScreen = () => {
   });
 
   useEffect(() => {
-    // Simulation du chargement de l'application
+    
     const timer = setTimeout(() => {
-      navigation.replace('Home'); // Remplacez 'Home' par le nom de votre écran principal
+      navigation.replace('Home'); 
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -33,13 +33,13 @@ const SplashScreen = () => {
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={require('./assets/medical-logo.png')} // Remplacez par le chemin de votre logo
+        source={require('./assets/medical-logo.png')} 
         style={[styles.logo, { transform: [{ rotate: spin }] }]}
       />
-      <Text style={styles.title}>MediCare</Text> {/* Remplacez par le nom de votre app */}
+      <Text style={styles.title}>MediCare</Text>
       <Text style={styles.subtitle}>Chargement de votre application médicale...</Text>
       
-      {/* Barre de progression */}
+ 
       <View style={styles.progressBar}>
         <Animated.View style={[styles.progressBarFill, { width: spinValue.interpolate({
           inputRange: [0, 1],
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff', // ou une couleur médicale comme #e3f2fd (bleu clair)
+    backgroundColor: '#fff', 
   },
   logo: {
     width: 150,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2a7fba', // Couleur bleue médicale
+    color: '#2a7fba', 
     marginBottom: 10,
   },
   subtitle: {

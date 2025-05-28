@@ -1,8 +1,8 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Importez les icônes
-import { auth } from '../firebaseConfig'; // Assurez-vous que le chemin est correct
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { auth } from '../firebaseConfig'; 
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export default function LoginScreen({ navigation }) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert("Succès", "Connexion réussie !");
-      navigation.navigate('Home'); // Naviguer vers l'écran principal
+      navigation.navigate('Home'); 
     } catch (error) {
       Alert.alert("Erreur", error.message);
     }
@@ -45,16 +45,16 @@ export default function LoginScreen({ navigation }) {
           style={styles.input} 
           placeholder="Mot de passe" 
           placeholderTextColor="#888" 
-          secureTextEntry={!showPassword} // Utiliser l'état pour contrôler la visibilité
+          secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Icon 
-            name={showPassword ? "visibility" : "visibility-off"} // Icône basée sur l'état
+            name={showPassword ? "visibility" : "visibility-off"}
             size={24}
             color="#00796B"
-            style={styles.eyeIcon} // Ajoutez un style si nécessaire
+            style={styles.eyeIcon}
           />
         </TouchableOpacity>
       </View>
@@ -126,7 +126,7 @@ image: {
   },
   icon: {
     marginRight: 10,
-    color: '#FFD700', // Espacement entre l'icône et le champ de texte
+    color: '#FFD700', 
   },
   input: {
     flex: 1,
