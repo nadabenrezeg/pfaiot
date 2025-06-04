@@ -1,7 +1,7 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { auth } from '../firebaseConfig'; // Assurez-vous que le chemin est correct
+import { auth } from '../firebaseConfig';
 
 export default function AuthScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -10,9 +10,9 @@ export default function AuthScreen({ navigation }) {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Home'); // Navigue vers l'écran d'accueil en cas de succès
+      navigation.navigate('Home'); 
     } catch (error) {
-      Alert.alert("Erreur", error.message); // Affiche une alerte en cas d'erreur
+      Alert.alert("Erreur", error.message); 
     }
   };
   return (

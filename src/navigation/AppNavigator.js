@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-// Importation des écrans
+
 import AddMedicaScreen from './screens/AddMedicaScreen';
 import CalendarScreen from './screens/CalendarScreen';
 
@@ -19,21 +19,21 @@ export default function AppNavigator() {
           headerTitleStyle: { fontWeight: 'bold' },
         }}
       >
-        {/* Écran principal : Calendrier */}
+       
         <Stack.Screen
           name="CalendarScreen"
           component={CalendarScreen}
           options={{
             title: 'Calendrier',
-            headerLeft: null, // <<< Pas de flèche retour sur le calendrier
+            headerLeft: null,
           }}
         />
 
-        {/* Écran d'ajout de médicament */}
+     
         <Stack.Screen
           name="AddMedicaScreen"
           component={AddMedicaScreen}
-          options={{ headerShown: false }} // <<< On cache complètement le header ici
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

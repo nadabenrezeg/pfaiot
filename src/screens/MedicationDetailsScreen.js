@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { db, onValue, ref, set } from '../firebaseConfig'; // ✅ Correction ici
+import { db, onValue, ref, set } from '../firebaseConfig';
 
 export default function MedicationDetailsScreen({ navigation }) {
   const [morning, setMorning] = useState(false);
@@ -27,8 +27,8 @@ export default function MedicationDetailsScreen({ navigation }) {
   const showWarning = !noon && !evening;
 
   useEffect(() => {
-    const dbRef = ref(db); // ✅ Correction ici
-    const medicationsRef = ref(db, 'medications'); // ✅ Correction ici
+    const dbRef = ref(db); 
+    const medicationsRef = ref(db, 'medications');
 
     const unsubscribeConfig = onValue(dbRef, (snapshot) => {
       const data = snapshot.val();
@@ -90,7 +90,7 @@ export default function MedicationDetailsScreen({ navigation }) {
   const recordMedicationTime = async (timeOfDay) => {
     try {
       const now = new Date();
-      const timeRef = ref(db, 'temps'); // ✅ Correction ici
+      const timeRef = ref(db, 'temps'); 
       await set(timeRef, now.toLocaleTimeString());
       Alert.alert('Succès', `Heure enregistrée: ${now.toLocaleTimeString()}`);
     } catch (error) {
